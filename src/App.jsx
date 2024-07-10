@@ -1,21 +1,33 @@
 // import './styles/dropdownStyle.css'
 
 import {Routes, Route} from "react-router-dom";
-import Form from "./pages/form";
+// import Form from "./pages/form";
+import Flow1 from "./pages/flow1";
+import Form1 from "./pages/form1";
 // import Dropdown from "./pages/dropdown";
-import ServiceDropdown from './pages/AddingService';
+// import ServiceDropdown from './pages/AddingService';
 import Navigation from "./navigation";
+import { Padding } from "@mui/icons-material";
+import {Box} from '@mui/material';
+// import Service from './pages/Service'
+// import ServiceReorder from "./pages/Flow";
 
 
 function App() {
   return (
     <>
+    {/* <Form1/> */}
+    {/* <Flow1/> */}
+    {/* <ServiceReorder/> */}
+    {/* <Service/> */}
     <div className="app">
       <Navigation/>
+      <Box sx={{ backgroundColor: '#ffffff', minHeight: '100vh', Padding:2 }}>
       <Routes>
-        <Route path="/" element={<Form/>}/>
-        <Route path="/servicedropdown" element={<ServiceDropdown/>}/>
+        <Route path="/" element={<Form1/>}/>
+        <Route path="/flow1" element={<Flow1/>}/>
       </Routes>
+      </Box>
     </div>
     {/* <ServiceDropdown/> */}
     {/* <BrowserRouter>

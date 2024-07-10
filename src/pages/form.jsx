@@ -10,12 +10,13 @@ const Form = () => {
     // const [responseSchema, setResponseSchema] = useState('');
     // const [url, setUrl] = useState('');
     const [isValid, setIsValid] = useState(null);
+    const [submissionError, setSubmissionError] = useState(null);
 
     const validateUrl = (value) => {
         const pattern = /^((ftp|http|https):\/\/)?www\.?([A-z]+)\.([A-z]{2,})/;
         return pattern.test(value) || 'Provide valid url';
     }
-    const onSubmit = (data) => {
+    // const onSubmit = (data) => {
         // event.preventDefault();
         // try{
         //     if(requestSchema.trim()!=="" && responseSchema.trim()!==""){
@@ -23,16 +24,39 @@ const Form = () => {
         //         JSON.parse(responseSchema);
         //         setIsValid(true);
         //         console.log('Form Submitted');
-                console.log(data);
-                setIsValid(true);
+                // console.log(data);
+                // setIsValid(true);
             // }else{
             //     setIsValid(false);
             //     console.error('Request and response schemas cannot be empty');
-            }     
+            // }     
     // }catch(error){
     //     setIsValid(false);
     //     console.error('Invalid JSON format', error);
     // }
+    const onSubmit = async(data)=>{
+        try{
+            const response = await fetch('https://localhost:5000/form',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if(!response.ok) {
+                throw new Error('Network response was not ok')
+            }
+
+            const responseData = await response.json();
+            console.log(responseData);
+            setIsValid(true);
+            setSubmissionError(null);
+        } catch(error) {
+            console.error('Error submitting form:', error);
+            setSubmissionError('Error submitting form');
+        }
+    };
 
     const validateJson = (value) => {
         try{
@@ -44,14 +68,27 @@ const Form = () => {
     }
 
 return(
-    <div className="container">
-        <div className="form-container">
+    <div>
+        
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <label htmlFor="name">Service Name</label>
                     <input id="name"
-                    {...register('name', {required: "Service Name is required"})}/>
+                    {...register('name', {required: "Service Name is required",
+                        validate: value => typeof value === 'string' || 'Service name must be a string'
+                    })}/>
                     {errors.name && <p>{errors.name.message}</p>}
+                </div>
+                <div>
+                <label htmlFor="authorization">Authorization:</label>
+                <input 
+                id='authorization'
+                {...register('authorization', {
+                    required: 'Authorization is required',
+                    validate: value => typeof value === 'string' || 'Authorization must be a string'
+                })}
+                />
+                {errors.authorization && <p>{errors.authorization.message}</p>}
                 </div>
                 {/* <label>Service Name</label>
                 <input type="text" value={name} onChange={(event) => setName(event.target.value)} required/> */}
@@ -90,9 +127,9 @@ return(
                 <input type="text" value={url} onChange={(event) => setUrl(event.target.value)} required/> */}
                 <button type="submit">Submit</button>
                 {isValid === true && (<p className="success">Form is Valid!</p>)}
-                {isValid === false && (<p className="fail">Form is invalid! Please check the input</p>)}
+                {/* {isValid === false && (<p className="fail">Form is invalid! Please check the input</p>)} */}
             </form>
-        </div>
+            {submissionError &&  <p className="error-message">{submissionError}</p>}
     </div>
 )
 };

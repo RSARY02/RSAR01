@@ -1,5 +1,8 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import "../styles/service.css"
+// import {Tree} from 'react-tree-graph';
+import {Tree} from 'react-d3-tree';
+
 
 function ServiceDropdown(){
     const [services, setServices] = useState([
@@ -10,6 +13,8 @@ function ServiceDropdown(){
     const [selectedService, setSelectedService] = useState(null);
     const [newService, setNewService] = useState("");
     const [newSubService, setNewSubService] = useState("");
+
+    const treeContainer =useRef(null);
 
     const handleServiceChange = (event) =>{
         setSelectedService(event.target.value);
@@ -41,7 +46,37 @@ function ServiceDropdown(){
             setServices(updatedServices);
             setNewSubService('');
         }
+    }
+    
+    const getTreeData = () => {
+        const treeData = {
+            name: 'Services',
+            children: services.map(service => ({
+            name: service.name,
+            children: service.subServices.map(subService => ({name: subService}))
+        }))
+      };
+      console.log('Tree Data:',JSON.stringify(treeData, null, 2));
+      return treeData;
     };
+    // const getTreeData = () => {
+    //     return (
+    //         <Tree label="Services">
+    //             {services.map((service, index)=> (
+    //                 <TreeNode key={index} label={service.name}>
+    //                     {service.subServices.map((subService, subIndex) => (
+    //                         <TreeNode key={subIndex} label={subService}/>
+    //                     ))}
+    //                 </TreeNode>
+    //             ))}
+    //         </Tree>
+    //     )
+    // }
+
+    useEffect(()=> {
+        console.log('Updated Services:', services);
+        console.log('Tree Data:', getTreeData());
+    }, [services]);
 
     return(
         <div className='container'>
@@ -66,7 +101,7 @@ function ServiceDropdown(){
                      </div>
             ) : selectedService && (
                 <div className='sub-services'>
-                    <h3>{selectedService} Sub Services:</h3>
+                    <h3>{selectedService} Connected Services:</h3>
                     <ul>
                         {services
                         .find((service) => service.name === selectedService)
@@ -79,7 +114,7 @@ function ServiceDropdown(){
                       value={newSubService}
                       onChange={(e) => setNewSubService(e.target.value)}
                       placeholder="Add new sub-service"/>
-                    <button onClick={handleAddSubService}>Add Sub-Service</button>
+                    <button onClick={handleAddSubService}>Add Connected Service</button>
                 </div>
             )}
             
@@ -103,6 +138,32 @@ function ServiceDropdown(){
                 </ul>
             </div>
             )}
+        </div>
+        <div className='graph-container'>
+            <h3>Service Tree</h3>
+            <div ref={treeContainer} className='tree-wrapper'>
+            <Tree
+              data={getTreeData()}
+            //   orientation="vertical"
+            //   translate={{ x:200, y:200 }}
+            //   zoomable={true}
+            //   nodeSize={{x:200, y: 100}}
+            //   collapsible={true}
+            //   initialDepth={1}
+            translate={{
+                x: treeContainer.current? treeContainer.current.clientWidth/2:0,
+                y: 100,
+            }}
+            zoomable
+            collapsible
+              />
+              
+            {/* //   pathFunc="straight"
+            //   height={400}
+            //   width={600}
+            //   animated
+            //   svgProps */}
+            </div>
         </div>
         </div>
     );
